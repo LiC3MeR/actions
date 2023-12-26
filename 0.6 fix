@@ -1,0 +1,70 @@
+<?php
+
+header('Content-Type:text/html; charset=utf-8');
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+class Api
+{
+    public function start_loads()
+    {
+        // Ввод значений от пользователя
+        $action_ids = $this->promptUser('Введите action_ids (если не нужно - оставьте пустым)');
+        $date_1 = $this->promptUser('Введите date_1 (если не нужно - оставьте пустым)');
+        $date_2 = $this->promptUser('Введите date_2 (если не нужно - оставьте пустым)');
+        $bp_api_key = $this->promptUser('Введите bp_api_key (если не нужно - оставьте пустым)');
+        $limit = $this->promptUser('Введите limit (по умолчанию 10)', '10');
+        $start_page = $this->promptUser('Введите start_page (по умолчанию 0)', '0');
+        $stop_page = $this->promptUser('Введите stop_page (если не нужно - оставьте пустым)');
+        $only_blue = $this->promptUser('Перенести только синие (да/нет)');
+        $set_status = $this->promptUser('Введите set_status (если не нужно - оставьте пустым)');
+
+        // Подготовка аргументов
+        $args = [
+            'action_ids' => $action_ids,
+            'date_1' => $date_1,
+            'date_2' => $date_2,
+            'bp_api_key' => $bp_api_key,
+            'limit' => $limit,
+            'start_page' => $start_page,
+            'stop_page' => $stop_page,
+            'only_blue' => $only_blue,
+            'set_status' => $set_status,
+        ];
+
+        // Фильтрация пустых значений
+        $filtered_args = array_filter($args, function ($value) {
+            return $value !== '';
+        });
+
+        // Преобразование в строку параметров
+        $params = http_build_query($filtered_args);
+
+        // Ваш код, использующий введенные значения
+        $json = file_get_contents(
+            "https://back.crm.acsolutions.ai/api/v2/test/test_commands?" .
+            "act=get_order_phone_by_action_api" .
+            "&api_key=WKLnen@KJNeE2keE3!mlee2" .
+            '&' . $params
+        );
+
+        // Остальной код остается неизменным
+    }
+
+    public function promptUser($message, $defaultValue = null)
+    {
+        echo $message . ($defaultValue ? " ($defaultValue)" : "") . ": ";
+        $input = trim(fgets(STDIN));
+        return $input !== '' ? $input : $defaultValue;
+    }
+}
+
+$arr = new Api;
+
+if (!isset($_SERVER['argv']) || !isset($_SERVER['argv'][1])) {
+    $arr->start_loads();
+} else {
+    exit('command not exists' . "\n");
+}
+?>
